@@ -119,6 +119,54 @@ router.patch('/:id', asyncHandler(async (req, res) => {
   res.json({ success: true, data: task })
 }))
 
+// PATCH /api/tasks/:id/subtasks — add a subtask
+router.patch('/:id/subtasks', asyncHandler(async (req, res) => {
+  const { text } = req.body
+  if (!text || !text.trim()) {
+    return res.status(400).json({ success: false, error: 'text is required' })
+  }
+
+  const task = await Task.findOne({ clientId: req.params.id, isDeleted: false, userId: req.userId })
+  if (!task) {
+    return res.status(404).json({ success: false, error: 'Task not found' })
+  }
+
+  task.subtasks.push({ text: text.trim(), completed: false })
+  await task.save()
+  await task.populate('category', 'name color')
+  res.json({ success: true, data: task })
+}))
+
+// PATCH /api/tasks/:id/subtasks/:subtaskId — toggle or edit subtask
+router.patch('/:id/subtasks/:subtaskId', asyncHandler(async (req, res) => {
+  const task = await Task.findOne({ clientId: req.params.id, isDeleted: false, userId: req.userId })
+  if (!task) return res.status(404).json({ success: false, error: 'Task not found' })
+
+  const subtask = task.subtasks.id(req.params.subtaskId)
+  if (!subtask) return res.status(404).json({ success: false, error: 'Subtask not found' })
+
+  if (req.body.text !== undefined) subtask.text = req.body.text.trim()
+  else subtask.completed = !subtask.completed
+
+  await task.save()
+  await task.populate('category', 'name color')
+  res.json({ success: true, data: task })
+}))
+
+// DELETE /api/tasks/:id/subtasks/:subtaskId — delete subtask
+router.delete('/:id/subtasks/:subtaskId', asyncHandler(async (req, res) => {
+  const task = await Task.findOne({ clientId: req.params.id, isDeleted: false, userId: req.userId })
+  if (!task) return res.status(404).json({ success: false, error: 'Task not found' })
+
+  const subtask = task.subtasks.id(req.params.subtaskId)
+  if (!subtask) return res.status(404).json({ success: false, error: 'Subtask not found' })
+
+  subtask.deleteOne()
+  await task.save()
+  await task.populate('category', 'name color')
+  res.json({ success: true, data: task })
+}))
+
 // DELETE /api/tasks/:id
 router.delete('/:id', asyncHandler(async (req, res) => {
   const task = await Task.findOne({ clientId: req.params.id, userId: req.userId })
