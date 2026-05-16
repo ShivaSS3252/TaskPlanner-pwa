@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+:root {
+  /* Dark — Warm Ink + Rose + Lime */
+  --bg-app: #100c0c;
+  --bg-navbar: rgba(16,12,12,0.88);
+  --bg-navbar-border: rgba(255,255,255,0.06);
+  --bg-card: rgba(255,255,255,0.07);
+  --bg-card-border: rgba(255,255,255,0.12);
+  --bg-panel: rgba(255,255,255,0.05);
+  --bg-input: rgba(255,255,255,0.09);
+  --bg-input-border: rgba(255,255,255,0.16);
+  --bg-pill-inactive: rgba(255,255,255,0.10);
+
+  --accent: #f43f5e;
+  --accent-hover: #fb7185;
+  --accent-bg: rgba(244,63,94,0.12);
+  --accent-border: rgba(244,63,94,0.3);
+  --accent-glow: 0 4px 20px rgba(244,63,94,0.3);
+
+  --lime: #a3e635;
+  --lime-bg: rgba(163,230,53,0.1);
+  --lime-border: rgba(163,230,53,0.25);
+
+  --text-heading: #fafafa;
+  --text-primary: rgba(250,250,250,0.92);
+  --text-secondary: rgba(250,250,250,0.75);
+  --text-muted: rgba(250,250,250,0.60);
+  --text-faint: rgba(250,250,250,0.45);
+  --text-pill-inactive: rgba(250,250,250,0.68);
+  --text-pill-new: rgba(250,250,250,0.55);
+
+  --border-subtle: rgba(255,255,255,0.12);
+  --border-input-focus: rgba(244,63,94,0.55);
+  --border-pill-new: rgba(255,255,255,0.22);
+
+  --btn-cancel-bg: rgba(255,255,255,0.08);
+  --btn-cancel-border: rgba(255,255,255,0.15);
+  --btn-cancel-color: rgba(250,250,250,0.65);
+  --btn-edit-bg: rgba(244,63,94,0.14);
+  --btn-edit-border: rgba(244,63,94,0.35);
+  --btn-edit-color: #fb7185;
+
+  --card-pending-bg: rgba(251,191,36,0.07);
+  --card-pending-border: rgba(251,191,36,0.25);
+  --card-completed-bg: rgba(163,230,53,0.05);
+  --card-completed-border: rgba(163,230,53,0.14);
+
+  --swatch-ring: #100c0c;
+  --card-shadow: none;
+}
+
+[data-theme="light"] {
+  /* Light — warm white + rose + lime */
+  --bg-app: #fdf8f8;
+  --bg-navbar: rgba(253,248,248,0.9);
+  --bg-navbar-border: rgba(0,0,0,0.07);
+  --bg-card: #ffffff;
+  --bg-card-border: rgba(0,0,0,0.13);
+  --bg-panel: rgba(255,255,255,0.7);
+  --bg-input: rgba(255,255,255,0.95);
+  --bg-input-border: rgba(0,0,0,0.09);
+  --bg-pill-inactive: rgba(0,0,0,0.05);
+
+  --accent: #e11d48;
+  --accent-hover: #f43f5e;
+  --accent-bg: rgba(225,29,72,0.08);
+  --accent-border: rgba(225,29,72,0.25);
+  --accent-glow: 0 4px 20px rgba(225,29,72,0.2);
+
+  --lime: #65a30d;
+  --lime-bg: rgba(101,163,13,0.08);
+  --lime-border: rgba(101,163,13,0.2);
+
+  --text-heading: #1c0a0f;
+  --text-primary: #1c0a0f;
+  --text-secondary: rgba(28,10,15,0.78);
+  --text-muted: rgba(28,10,15,0.62);
+  --text-faint: rgba(28,10,15,0.48);
+  --text-pill-inactive: rgba(28,10,15,0.70);
+  --text-pill-new: rgba(28,10,15,0.58);
+
+  --border-subtle: rgba(0,0,0,0.12);
+  --border-input-focus: rgba(225,29,72,0.5);
+  --border-pill-new: rgba(0,0,0,0.18);
+
+  --btn-cancel-bg: rgba(0,0,0,0.06);
+  --btn-cancel-border: rgba(0,0,0,0.14);
+  --btn-cancel-color: rgba(28,10,15,0.65);
+  --btn-edit-bg: rgba(225,29,72,0.10);
+  --btn-edit-border: rgba(225,29,72,0.30);
+  --btn-edit-color: #be123c;
+
+  --card-pending-bg: rgba(251,191,36,0.06);
+  --card-pending-border: rgba(251,191,36,0.25);
+  --card-completed-bg: rgba(101,163,13,0.04);
+  --card-completed-border: rgba(101,163,13,0.12);
+
+  --swatch-ring: #fdf8f8;
+  --card-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+}
