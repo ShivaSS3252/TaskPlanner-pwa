@@ -48,6 +48,45 @@ export const deleteTaskAPI = async (clientId) => {
   return res.json()
 }
 
+export const addSubtaskAPI = async (clientId, text) => {
+  const res = await fetch(`${BASE_URL}/api/tasks/${clientId}/subtasks`, {
+    method: 'PATCH',
+    headers: await authHeaders(),
+    body: JSON.stringify({ text }),
+  })
+  if (!res.ok) throw new Error('Failed to add subtask')
+  return res.json()
+}
+
+export const toggleSubtaskAPI = async (clientId, subtaskId) => {
+  const res = await fetch(`${BASE_URL}/api/tasks/${clientId}/subtasks/${subtaskId}`, {
+    method: 'PATCH',
+    headers: await authHeaders(),
+    body: JSON.stringify({}),
+  })
+  if (!res.ok) throw new Error('Failed to toggle subtask')
+  return res.json()
+}
+
+export const editSubtaskAPI = async (clientId, subtaskId, text) => {
+  const res = await fetch(`${BASE_URL}/api/tasks/${clientId}/subtasks/${subtaskId}`, {
+    method: 'PATCH',
+    headers: await authHeaders(),
+    body: JSON.stringify({ text }),
+  })
+  if (!res.ok) throw new Error('Failed to edit subtask')
+  return res.json()
+}
+
+export const deleteSubtaskAPI = async (clientId, subtaskId) => {
+  const res = await fetch(`${BASE_URL}/api/tasks/${clientId}/subtasks/${subtaskId}`, {
+    method: 'DELETE',
+    headers: await authHeaders(),
+  })
+  if (!res.ok) throw new Error('Failed to delete subtask')
+  return res.json()
+}
+
 export const syncTasksAPI = async (tasks) => {
   const res = await fetch(`${BASE_URL}/api/tasks/sync`, {
     method: 'POST',

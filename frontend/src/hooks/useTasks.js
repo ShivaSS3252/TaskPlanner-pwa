@@ -8,6 +8,7 @@ import { registerBackgroundSync } from '../sync'
 import {
   createTaskAPI, getTasksAPI,
   updateTaskAPI, deleteTaskAPI, syncTasksAPI,
+  addSubtaskAPI, toggleSubtaskAPI, editSubtaskAPI, deleteSubtaskAPI,
 } from '../api/tasks'
 
 const checkRealConnectivity = async () => {
@@ -89,6 +90,11 @@ export const useTasks = (selectedCategory = null) => {
         priority: t.priority || 'medium',
         dueDate: t.dueDate || null,
         completedAt: t.completedAt || null,
+        subtasks: (t.subtasks || []).map((s) => ({
+          _id: s._id?.toString?.() ?? s._id,
+          text: s.text,
+          completed: s.completed,
+        })),
         createdAt: t.clientCreatedAt
           ? new Date(t.clientCreatedAt).getTime()
           : new Date(t.createdAt).getTime(),
@@ -367,7 +373,46 @@ export const useTasks = (selectedCategory = null) => {
     setTimeout(() => { isMutating.current = false }, 1000)
   }
 
+  const patchSubtasks = (taskId, subtasks) => {
+    setAllTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, subtasks } : t))
+  }
+
+  const addSubtask = async (taskId, text) => {
+    const res = await addSubtaskAPI(taskId, text)
+    patchSubtasks(taskId, res.data.subtasks)
+  }
+
+  const toggleSubtask = (taskId, subtaskId) => {
+    setAllTasks((prev) => prev.map((t) => {
+      if (t.id !== taskId) return t
+      return { ...t, subtasks: (t.subtasks || []).map((s) => s._id === subtaskId ? { ...s, completed: !s.completed } : s) }
+    }))
+    toggleSubtaskAPI(taskId, subtaskId)
+      .then((res) => patchSubtasks(taskId, res.data.subtasks))
+      .catch(() => {
+        setAllTasks((prev) => prev.map((t) => {
+          if (t.id !== taskId) return t
+          return { ...t, subtasks: (t.subtasks || []).map((s) => s._id === subtaskId ? { ...s, completed: !s.completed } : s) }
+        }))
+      })
+  }
+
+  const deleteSubtask = (taskId, subtaskId) => {
+    setAllTasks((prev) => prev.map((t) => {
+      if (t.id !== taskId) return t
+      return { ...t, subtasks: (t.subtasks || []).filter((s) => s._id !== subtaskId) }
+    }))
+    deleteSubtaskAPI(taskId, subtaskId)
+      .then((res) => patchSubtasks(taskId, res.data.subtasks))
+      .catch(console.error)
+  }
+
+  const editSubtask = async (taskId, subtaskId, text) => {
+    const res = await editSubtaskAPI(taskId, subtaskId, text)
+    patchSubtasks(taskId, res.data.subtasks)
+  }
+
   const allVisibleTasks = allTasks.filter((t) => !t.isDeleted)
 
-  return { tasks, allVisibleTasks, loading, createTask, editTask, toggleTask, removeTask, loadTasks, updateTaskMeta }
+  return { tasks, allVisibleTasks, loading, createTask, editTask, toggleTask, removeTask, loadTasks, updateTaskMeta, addSubtask, toggleSubtask, deleteSubtask, editSubtask }
 }

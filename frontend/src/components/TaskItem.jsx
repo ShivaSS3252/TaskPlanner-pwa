@@ -24,7 +24,7 @@ const getDueDateInfo = (dueDate, completed) => {
   return { label: `Due ${formatted}`, color: 'var(--text-muted)', isOverdue: false }
 }
 
-export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAddSubtask, index }) => {
+export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAddSubtask, onToggleSubtask, onDeleteSubtask, onEditSubtask, index }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(task.text)
   const [editPriority, setEditPriority] = useState(task.priority || 'medium')
@@ -50,6 +50,7 @@ export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAdd
       setEditDueDate(task.dueDate || '')
     }
   }, [task.priority, task.dueDate, isEditing])
+
 
   const handleSave = async () => {
     const trimmed = editText.trim()
@@ -84,17 +85,20 @@ export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAdd
       setSubtasks(result)
     } catch (err) {
       if (err.message === 'NO_KEY') {
-        setBreakdownError('Add VITE_GEMINI_API_KEY to your .env file to use AI breakdown.')
+        setBreakdownError('Add VITE_GROQ_API_KEY to your .env file to use AI breakdown.')
       } else {
-        setBreakdownError('AI breakdown failed. Check your API key or try again.')
+        setBreakdownError(`AI breakdown failed: ${err.message}`)
       }
     } finally {
       setIsBreakingDown(false)
     }
   }
 
+  const [editingSubtaskId, setEditingSubtaskId] = useState(null)
+  const [editingSubtaskText, setEditingSubtaskText] = useState('')
+
   const handleAddSubtask = (text, idx) => {
-    if (onAddSubtask) onAddSubtask(text, task.category, { priority: task.priority || 'medium', dueDate: task.dueDate || null })
+    if (onAddSubtask) onAddSubtask(task.id, text)
     setAddedIndices((prev) => new Set([...prev, idx]))
   }
 
@@ -102,6 +106,12 @@ export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAdd
     subtasks.forEach((text, idx) => {
       if (!addedIndices.has(idx)) handleAddSubtask(text, idx)
     })
+  }
+
+  const handleEditSubtask = (subtaskId) => {
+    const trimmed = editingSubtaskText.trim()
+    if (trimmed && onEditSubtask) onEditSubtask(task.id, subtaskId, trimmed)
+    setEditingSubtaskId(null)
   }
 
   const isPending    = task.syncStatus === 'pending'
@@ -333,6 +343,93 @@ export const TaskItem = ({ task, onToggle, onDelete, onEdit, onUpdateMeta, onAdd
           )}
         </div>
       </div>
+
+      {/* Saved subtasks — shown inline under the task */}
+      {(task.subtasks || []).length > 0 && (
+        <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '10px 20px 14px 56px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {(task.subtasks || []).map((sub) => (
+              <div
+                key={sub._id}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '2px 0' }}
+              >
+                {/* Checkbox */}
+                <button
+                  onClick={() => onToggleSubtask && onToggleSubtask(task.id, sub._id)}
+                  style={{
+                    flexShrink: 0,
+                    width: '22px', height: '22px', borderRadius: '50%',
+                    cursor: 'pointer', transition: 'all 0.2s',
+                    background: sub.completed ? 'linear-gradient(135deg, var(--lime), #84cc16)' : 'transparent',
+                    border: sub.completed ? 'none' : '2px solid var(--border-subtle)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: sub.completed ? '0 2px 8px rgba(163,230,53,0.35)' : 'none',
+                  }}
+                >
+                  {sub.completed && (
+                    <svg width="10" height="8" viewBox="0 0 12 10" fill="none">
+                      <path d="M1 5L4 8L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+
+                {/* Text or inline edit input */}
+                {editingSubtaskId === sub._id ? (
+                  <input
+                    autoFocus
+                    value={editingSubtaskText}
+                    onChange={(e) => setEditingSubtaskText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleEditSubtask(sub._id)
+                      if (e.key === 'Escape') setEditingSubtaskId(null)
+                    }}
+                    onBlur={() => handleEditSubtask(sub._id)}
+                    style={{
+                      flex: 1, fontSize: '13px', fontWeight: 500,
+                      background: 'var(--bg-input)', border: '1px solid var(--border-input-focus)',
+                      borderRadius: '6px', padding: '2px 8px', color: 'var(--text-primary)', outline: 'none',
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      flex: 1, fontSize: '13px', fontWeight: 500,
+                      color: sub.completed ? 'var(--text-faint)' : 'var(--text-secondary)',
+                      textDecoration: sub.completed ? 'line-through' : 'none',
+                    }}
+                  >{sub.text}</span>
+                )}
+
+                {/* Edit button */}
+                {!sub.completed && editingSubtaskId !== sub._id && (
+                  <button
+                    onClick={() => { setEditingSubtaskId(sub._id); setEditingSubtaskText(sub.text) }}
+                    style={{
+                      width: '24px', height: '24px', borderRadius: '6px', cursor: 'pointer',
+                      background: 'var(--btn-edit-bg)', border: '1px solid var(--btn-edit-border)',
+                      color: 'var(--btn-edit-color)', fontSize: '14px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    }}
+                    title="Edit subtask"
+                  >✎</button>
+                )}
+
+                {/* Delete button */}
+                <button
+                  onClick={() => onDeleteSubtask && onDeleteSubtask(task.id, sub._id)}
+                  style={{
+                    width: '24px', height: '24px', borderRadius: '6px', cursor: 'pointer',
+                    background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)',
+                    color: '#f87171', fontSize: '16px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}
+                  title="Delete subtask"
+                >×</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* AI subtask panel */}
       {(subtasks.length > 0 || breakdownError) && (

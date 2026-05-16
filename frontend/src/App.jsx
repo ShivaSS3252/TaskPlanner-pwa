@@ -64,7 +64,7 @@ function AuthenticatedApp({ user, signOut }) {
     addCategoryFromSSE, updateCategoryFromSSE, removeCategoryFromSSE,
   } = useCategories()
 
-  const { tasks, allVisibleTasks, loading, createTask, editTask, toggleTask, removeTask, updateTaskMeta } = useTasks(selectedCategory)
+  const { tasks, allVisibleTasks, loading, createTask, editTask, toggleTask, removeTask, updateTaskMeta, addSubtask, toggleSubtask, deleteSubtask, editSubtask } = useTasks(selectedCategory)
 
   const { sseStatus } = useSSE({
     onNewCategory: async (cat) => { await addCategoryFromSSE(cat); showToast(`"${cat.name}" synced ✨`, 'success') },
@@ -321,7 +321,10 @@ function AuthenticatedApp({ user, signOut }) {
                           onDelete={handleRemoveTask}
                           onEdit={handleEditTask}
                           onUpdateMeta={updateTaskMeta}
-                          onAddSubtask={(text, category, options) => handleCreateTask(text, category, options)}
+                          onAddSubtask={(taskId, text) => addSubtask(taskId, text)}
+                          onToggleSubtask={(taskId, subtaskId) => toggleSubtask(taskId, subtaskId)}
+                          onDeleteSubtask={(taskId, subtaskId) => deleteSubtask(taskId, subtaskId)}
+                          onEditSubtask={(taskId, subtaskId, text) => editSubtask(taskId, subtaskId, text)}
                         />
                       </div>
                     ))}

@@ -65,9 +65,9 @@ body {
   --btn-cancel-bg: rgba(255,255,255,0.08);
   --btn-cancel-border: rgba(255,255,255,0.15);
   --btn-cancel-color: rgba(250,250,250,0.65);
-  --btn-edit-bg: rgba(244,63,94,0.14);
-  --btn-edit-border: rgba(244,63,94,0.35);
-  --btn-edit-color: #fb7185;
+  --btn-edit-bg: rgba(163,230,53,0.14);
+  --btn-edit-border: rgba(163,230,53,0.35);
+  --btn-edit-color: #a3e635;
 
   --card-pending-bg: rgba(251,191,36,0.07);
   --card-pending-border: rgba(251,191,36,0.25);
@@ -115,9 +115,9 @@ body {
   --btn-cancel-bg: rgba(0,0,0,0.06);
   --btn-cancel-border: rgba(0,0,0,0.14);
   --btn-cancel-color: rgba(28,10,15,0.65);
-  --btn-edit-bg: rgba(225,29,72,0.10);
-  --btn-edit-border: rgba(225,29,72,0.30);
-  --btn-edit-color: #be123c;
+  --btn-edit-bg: rgba(101,163,13,0.12);
+  --btn-edit-border: rgba(101,163,13,0.35);
+  --btn-edit-color: #65a30d;
 
   --card-pending-bg: rgba(251,191,36,0.06);
   --card-pending-border: rgba(251,191,36,0.25);

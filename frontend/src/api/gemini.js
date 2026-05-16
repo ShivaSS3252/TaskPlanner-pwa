@@ -1,9 +1,9 @@
-// src/api/gemini.js
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`
+// src/api/gemini.js — uses Groq (free, 14,400 req/day)
+const API_KEY = import.meta.env.VITE_GROQ_API_KEY
+const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 
 export const breakdownTask = async (taskText) => {
-  if (!API_KEY || API_KEY === 'your_gemini_api_key_here') {
+  if (!API_KEY || API_KEY === 'your_groq_api_key_here') {
     throw new Error('NO_KEY')
   }
 
@@ -20,10 +20,15 @@ Example output: ["Research top 5 competitors", "List their key features", "Note 
 
   const res = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${API_KEY}`,
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: 300 },
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 300,
     }),
   })
 
@@ -33,16 +38,14 @@ Example output: ["Research top 5 competitors", "List their key features", "Note 
   }
 
   const data = await res.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || ''
+  const text = data.choices?.[0]?.message?.content?.trim() || ''
 
-  // Try JSON array parse first
   const arrayMatch = text.match(/\[[\s\S]*?\]/)
   if (arrayMatch) {
     const parsed = JSON.parse(arrayMatch[0])
     if (Array.isArray(parsed) && parsed.length > 0) return parsed
   }
 
-  // Fallback: numbered list parsing
   const lines = text.split('\n')
     .map((l) => l.replace(/^[\d\-\*\•]+[\.\)]\s*/, '').trim())
     .filter((l) => l.length > 3)
