@@ -27,12 +27,12 @@ registerRoute(
 )
 
 // ------------------------------------------------
-// 3. NETWORK FIRST — Task Data
+// 3. NETWORK FIRST — Task & Category Data
 // ------------------------------------------------
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/tasks'),
+  ({ url }) => url.pathname.startsWith('/api/tasks') || url.pathname.startsWith('/api/categories'),
   new NetworkFirst({
-    cacheName: 'tasks-api-cache',
+    cacheName: 'api-cache',
     plugins: [
       new ExpirationPlugin({
         maxEntries: 100,
@@ -90,7 +90,7 @@ const syncPendingTasks = async () => {
     // Use bulk sync endpoint
     const apiUrl = self.location.origin.includes('localhost')
       ? 'http://localhost:5000'
-      : 'https://your-railway-url.com' // update after deploy
+      : 'https://taskplanner-backend-cnrp.onrender.com'
 
     const response = await fetch(`${apiUrl}/api/tasks/sync`, {
       method: 'POST',
