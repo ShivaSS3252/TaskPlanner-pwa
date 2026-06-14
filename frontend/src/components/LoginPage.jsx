@@ -8,13 +8,19 @@ export const LoginPage = () => {
   const handleSignIn = async () => {
     setLoading(true)
     setError('')
+
+    // Safety net — Firebase can take 1-3s to detect popup closed, reset regardless
+    const timeout = setTimeout(() => setLoading(false), 3000)
+
     try {
       await signInWithGoogle()
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
+      const ignored = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request']
+      if (!ignored.includes(err.code)) {
         setError('Sign-in failed. Please try again.')
       }
     } finally {
+      clearTimeout(timeout)
       setLoading(false)
     }
   }
