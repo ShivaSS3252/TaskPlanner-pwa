@@ -38,10 +38,12 @@ app.use(express.json())
 app.use(cors({
   origin: [
     process.env.CLIENT_URL,
+    'https://task-planner-pwa-gules.vercel.app',
     'http://localhost:5173',
     'http://localhost:4173',
   ],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }))
 
